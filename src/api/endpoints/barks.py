@@ -8,4 +8,4 @@ def barks_list(request):
     """
     Bark list endpoint that returns a list of barks.
     """
-    return [{"id": 1, "message": "bark one!"}, {"id": 2, "message": "bark two!"}]
+    return [{"foo": "bar"},{"id": 1, "message": "bark one!"}, {"id": 2, "message": "bark two!"}]
