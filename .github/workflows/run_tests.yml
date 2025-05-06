@@ -16,7 +16,7 @@ jobs:
       - name: Get test binary
         run: |
             timestamp=$(date +%s)
-            curl -o cicd_test_binary.tar.gz "https://test-binary.codeling.dev/cicd_test_binary.tar.gz?t=$timestamp" && \
+            curl -o cicd_test_binary.tar.gz "https://test-binary.codeling.dev/cicd_test_binary_staging.tar.gz?t=$timestamp" && \
             tar xzf cicd_test_binary.tar.gz && \
             chmod +x cicd_test_binary
 
