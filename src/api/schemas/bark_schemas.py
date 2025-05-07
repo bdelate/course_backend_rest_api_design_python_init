@@ -9,3 +9,7 @@ class BarkSchemaOut(Schema):
 class ErrorSchemaOut(Schema):
     """Schema for error responses"""
     error: str
+
+class BarkSchemaIn(Schema):
+    """Schema for bark requests"""
+    message: str
