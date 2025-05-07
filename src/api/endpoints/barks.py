@@ -7,7 +7,7 @@ router = Router()
 @router.get("/", response=list[BarkSchemaOut])
 def barks_list(request):
     """
-    Bark list endpoint that returns a list of barks.
+    Bark list endpoint that returns a list of barks.s
     """
     return [{'id':1, 'message': 'bark 1!'}, {'id':2, 'message': 'bark 2!'}, {'id':3, 'message': 'bark 3!'}]
 
