@@ -4,7 +4,7 @@ from api.schemas.bark_schemas import BarkSchemaOut
 router = Router()
 
 
-@router.get("/")
+@router.get("/", response=list[BarkSchemaOut])
 def barks_list(request):
     """
     Bark list endpoint that returns a list of barks.
