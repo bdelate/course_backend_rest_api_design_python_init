@@ -6,10 +6,22 @@ class BarkSchemaOut(ModelSchema):
     """Schema for bark responses"""
 
     user: DogUserSchemaOut
+    created_time: str
+    created_date: str
 
     class Meta:
         model = BarkModel
-        fields = ['id', 'message']
+        fields = ["id", "message"]
+
+    @staticmethod
+    def resolve_created_time(obj):
+        """Resolve created time in format 06:12pm from created_at field"""
+        return obj.created_at.strftime("%I:%M %p")
+    
+    @staticmethod
+    def resolve_created_date(obj):
+        """Resolve created date in format 2023-10-01 from created_at field"""
+        return obj.created_at.strftime("%Y-%m-%d")
 
 
 
