@@ -24,6 +24,13 @@ class BarkSchemaOut(ModelSchema):
         return obj.created_at.strftime("%d%b%y")
 
 
+class BarkCreateSchemaIn(ModelSchema):
+    """Schema for bark creation requests"""
+
+    class Meta:
+        model = BarkModel
+        fields = ["message"]
+
 
 
 class ErrorSchemaOut(Schema):

@@ -1,6 +1,6 @@
 from ninja import Router
-from api.schemas.bark_schemas import BarkSchemaOut, ErrorSchemaOut, BarkSchemaIn
-from core.models import BarkModel
+from api.schemas.bark_schemas import BarkSchemaOut, ErrorSchemaOut, BarkSchemaIn, BarkCreateSchemaIn
+from core.models import BarkModel, DogUserModel
 from uuid import UUID
 
 router = Router()
@@ -38,3 +38,12 @@ def update_bark(request, bark_id: int, bark: BarkSchemaIn):
     if bark_id in [1, 2, 3]:
         return 200, {"id": bark_id, "message": bark.message}
     return 404, {"error": "Bark not found"}
+
+
+@router.post("/", response={201: BarkSchemaOut})
+def create_bark(request, bark: BarkCreateSchemaIn):
+    """Create a new bark."""
+    data = bark.dict()
+    data['user_id'] = DogUserModel.objects.first().id
+    obj = BarkModel.objects.create(**data)
+    return 201, obj
