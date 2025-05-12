@@ -9,6 +9,8 @@ class BarkSchemaOut(ModelSchema):
     user: DogUserSchemaOut
     created_time: str
     created_date: str
+    updated_date: str
+    updated_time: str
 
     class Meta:
         model = BarkModel
@@ -23,6 +25,16 @@ class BarkSchemaOut(ModelSchema):
     def resolve_created_date(obj):
         """Resolve the created date in format 15Jan25 from the created_at field"""
         return obj.created_at.strftime("%d%b%y")
+    
+    @staticmethod
+    def resolve_updated_date(obj):
+        """Resolve the updated date in format 15Jan25 from the updated_at field"""
+        return obj.updated_at.strftime("%d%b%y")
+    
+    @staticmethod
+    def resolve_updated_time(obj):
+        """Resolve updated time in format 06:12pm from updated_at field"""
+        return obj.updated_at.strftime("%I:%M %p")
 
 
 class BarkCreateUpdateSchemaIn(ModelSchema):
