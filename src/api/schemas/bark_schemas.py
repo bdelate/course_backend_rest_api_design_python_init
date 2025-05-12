@@ -20,8 +20,8 @@ class BarkSchemaOut(ModelSchema):
     
     @staticmethod
     def resolve_created_date(obj):
-        """Resolve created date in format 2023-10-01 from created_at field"""
-        return obj.created_at.strftime("%Y-%m-%d")
+        """Resolve the created date in format 15Jan25 from the created_at field"""
+        return obj.created_at.strftime("%d%b%y")
 
 
 
