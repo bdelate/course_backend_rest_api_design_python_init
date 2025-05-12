@@ -1,5 +1,5 @@
 from ninja import Router
-from api.schemas.bark_schemas import BarkSchemaOut, ErrorSchemaOut, BarkSchemaIn, BarkCreateSchemaIn
+from api.schemas.bark_schemas import BarkSchemaOut, ErrorSchemaOut, BarkSchemaIn, BarkCreateUpdateSchemaIn
 from core.models import BarkModel, DogUserModel
 from uuid import UUID
 
@@ -33,15 +33,21 @@ def delete_bark(request, bark_id: int):
 
 
 @router.put("/{bark_id}/", response={200: BarkSchemaOut, 404: ErrorSchemaOut})
-def update_bark(request, bark_id: int, bark: BarkSchemaIn):
+def update_bark(request, bark_id: UUID, bark: BarkCreateUpdateSchemaIn):
     """Update an existing bark."""
-    if bark_id in [1, 2, 3]:
-        return 200, {"id": bark_id, "message": bark.message}
-    return 404, {"error": "Bark not found"}
+    bark_instance = BarkModel.objects.filter(id=bark_id).first()
+    if not bark_instance:
+        return 404, {"error": "Bark not found"}
+
+    # Update the bark instance with the new data
+    for attr, value in bark.dict().items():
+        setattr(bark_instance, attr, value)
+    bark_instance.save()
+    return 200, bark_instance
 
 
 @router.post("/", response={201: BarkSchemaOut})
-def create_bark(request, bark: BarkCreateSchemaIn):
+def create_bark(request, bark: BarkCreateUpdateSchemaIn):
     """Create a new bark."""
     data = bark.dict()
     data['user_id'] = DogUserModel.objects.first().id
