@@ -1,5 +1,6 @@
 from ninja import Router
 from api.schemas.bark_schemas import BarkSchemaOut, ErrorSchemaOut, BarkSchemaIn
+from core.models import BarkModel
 
 router = Router()
 
@@ -9,7 +10,7 @@ def barks_list(request):
     """
     Bark list endpoint that returns a list of barks.s
     """
-    return [{'id':1, 'message': 'bark 1!'}, {'id':2, 'message': 'bark 2!'}, {'id':3, 'message': 'bark 3!'}]
+    return BarkModel.objects.all()
 
 
 @router.get("/{bark_id}/", response={200: BarkSchemaOut, 404: ErrorSchemaOut})

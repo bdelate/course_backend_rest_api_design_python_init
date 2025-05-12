@@ -1,9 +1,14 @@
-from ninja import Schema
+from ninja import Schema, ModelSchema
+from core.models import BarkModel
 
-class BarkSchemaOut(Schema):
+
+class BarkSchemaOut(ModelSchema):
     """Schema for bark responses"""
-    id: int
-    message: str
+
+    class Meta:
+        model = BarkModel
+        fields = ['id', 'message']
+
 
 
 class ErrorSchemaOut(Schema):
