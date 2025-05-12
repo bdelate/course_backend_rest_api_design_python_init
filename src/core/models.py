@@ -36,4 +36,4 @@ class BarkModel(BaseModel):
         verbose_name_plural = "Barks"
 
     def __str__(self):
-        return self.message
+        f"{self.user.username} - {self.message[:20]}..."
