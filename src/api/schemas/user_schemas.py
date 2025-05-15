@@ -25,3 +25,4 @@ class DogUserCreateSchemaIn(ModelSchema):
         """Ensure is at least 3 characters long"""
         if len(v) < 3:
             raise ValueError("Username must be at least 3 characters long")
+        return v
