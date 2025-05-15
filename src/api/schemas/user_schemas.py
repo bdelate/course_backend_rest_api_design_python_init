@@ -26,3 +26,15 @@ class DogUserCreateSchemaIn(ModelSchema):
         if len(v) < 3:
             raise ValueError("Username must be at least 3 characters long")
         return v
+    
+
+class DogUserUpdateSchemaIn(ModelSchema):
+    """Schema for updating dog users"""
+    username: str | None = None
+    favorite_toy: str | None = None
+
+    class Meta:
+        model = DogUserModel
+        fields = ["username", "favorite_toy"]
+        fields_optional = ["username", "favorite_toy"]
+
