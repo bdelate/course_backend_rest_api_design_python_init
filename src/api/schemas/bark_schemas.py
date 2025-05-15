@@ -1,4 +1,4 @@
-from ninja import Schema, ModelSchema
+from ninja import ModelSchema
 from core.models import BarkModel
 from api.schemas.user_schemas import DogUserSchemaOut
 from pydantic import field_validator
@@ -54,6 +54,3 @@ class BarkCreateUpdateSchemaIn(ModelSchema):
             raise ValueError("Message cannot be empty or just whitespace")
         return v
 
-class ErrorSchemaOut(Schema):
-    """Schema for error responses"""
-    error: str
