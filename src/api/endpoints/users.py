@@ -1,3 +1,4 @@
+from uuid import UUID
 from ninja import Router
 from api.schemas.user_schemas import DogUserSchemaOut, DogUserCreateSchemaIn
 from core.models import DogUserModel
@@ -23,7 +24,7 @@ def create_user(request, user: DogUserCreateSchemaIn):
     return 201, obj
 
 @router.get("/{user_id}/", response=DogUserSchemaOut)
-def get_user(request, user_id: int):
+def get_user(request, user_id: UUID):
     """Get a user by ID."""
     try:
         obj = DogUserModel.objects.get(id=user_id)
