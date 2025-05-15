@@ -13,6 +13,8 @@ class DogUserSchemaOut(ModelSchema):
 class DogUserCreateSchemaIn(ModelSchema):
     """Schema for dog user creation requests"""
 
+    username: str
+
     class Meta:
         model = DogUserModel
         fields = ['username']
