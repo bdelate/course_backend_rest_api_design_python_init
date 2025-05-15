@@ -1,5 +1,5 @@
 from ninja import Router
-from api.schemas.ErrorSchemaOut import ErrorSchemaOut
+from api.schemas.common_schemas import ErrorSchemaOut
 from api.schemas.bark_schemas import BarkSchemaOut, BarkCreateUpdateSchemaIn
 from core.models import BarkModel, DogUserModel
 from uuid import UUID
