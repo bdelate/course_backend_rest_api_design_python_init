@@ -23,7 +23,7 @@ def create_user(request, user: DogUserCreateSchemaIn):
     obj = DogUserModel.objects.create(**data)
     return 201, obj
 
-@router.get("/{user_id}/", response=DogUserSchemaOut)
+@router.get("/{user_id}/", response={200: DogUserSchemaOut, 404: ErrorSchemaOut})
 def get_user(request, user_id: UUID):
     """Get a user by ID."""
     try:
