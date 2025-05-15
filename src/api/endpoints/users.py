@@ -21,3 +21,12 @@ def create_user(request, user: DogUserCreateSchemaIn):
         return 400, {"error": "Username already exists"}
     obj = DogUserModel.objects.create(**data)
     return 201, obj
+
+@router.get("/{user_id}/", response=DogUserSchemaOut)
+def get_user(request, user_id: int):
+    """Get a user by ID."""
+    try:
+        obj = DogUserModel.objects.get(id=user_id)
+    except DogUserModel.DoesNotExist:
+        return 404, {"error": "Dog user not found"}
+    return obj
