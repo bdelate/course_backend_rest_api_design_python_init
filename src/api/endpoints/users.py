@@ -1,6 +1,7 @@
 from ninja import Router
 from api.schemas.user_schemas import DogUserSchemaOut, DogUserCreateSchemaIn
 from core.models import DogUserModel
+from api.schemas.common_schemas import ErrorSchemaOut
 
 router = Router()
 
@@ -12,7 +13,7 @@ def users_list(request):
     return DogUserModel.objects.all()
 
 
-@router.post("/", response={201: DogUserSchemaOut})
+@router.post("/", response={201: DogUserSchemaOut, 400: ErrorSchemaOut})
 def create_user(request, user: DogUserCreateSchemaIn):
     """Create a new user."""
     data = user.dict()
