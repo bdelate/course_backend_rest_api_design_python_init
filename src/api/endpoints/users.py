@@ -32,7 +32,7 @@ def get_user(request, user_id: UUID):
         return 404, {"error": "Dog user not found"}
     return obj
 
-@router.patch("/{user_id}/", response={200: DogUserSchemaOut, 404: ErrorSchemaOut})
+@router.patch("/{user_id}/", response={200: DogUserSchemaOut, 404: ErrorSchemaOut, 400: ErrorSchemaOut})
 def update_user(request, user_id: UUID, user: DogUserUpdateSchemaIn):
     """Update a user by ID."""
     try:
@@ -41,6 +41,9 @@ def update_user(request, user_id: UUID, user: DogUserUpdateSchemaIn):
         return 404, {"error": "Dog user not found"}
     
     data = user.dict(exclude_unset=True)
+    if 'username' in data and data['username'] != obj.username:
+        if DogUserModel.objects.filter(username=data['username']).exists():
+            return 400, {"error": "Username already exists"}
     for attr, value in data.items():
         setattr(obj, attr, value)
     obj.save()
