@@ -4,7 +4,7 @@ from api.schemas.auth_schemas import TokenRequestSchemaOut, TokenRequestSchemaIn
 from core.models import AuthTokenModel
 from django.contrib.auth import authenticate
 from django.utils import timezone
-from common.auth.jwt_auth import create_jwt_token
+from common.auth.jwt_auth import create_jwt
 
 router = Router()
 
@@ -85,8 +85,8 @@ def get_jwt_token(request, credentials: TokenRequestSchemaIn):
     if user is None:
         return 401, {"error": "Invalid credentials"}
     
-    access_token = create_jwt_token(user.id, 'access')
-    refresh_token = create_jwt_token(user.id, 'refresh')
+    access_token = create_jwt(user.id, 'access')
+    refresh_token = create_jwt(user.id, 'refresh')
     
     return 200, {
         "access_token": access_token,
