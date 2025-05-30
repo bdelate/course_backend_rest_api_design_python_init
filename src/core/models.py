@@ -47,6 +47,13 @@ class BarkModel(BaseModel):
 class AuthTokenModel(BaseModel):
     """Represents an authentication token for a user"""
 
+    TOKEN_TYPE_ACCESS = "access"
+    TOKEN_TYPE_REFRESH = "refresh"
+    TOKEN_TYPE_CHOICES = [
+        (TOKEN_TYPE_ACCESS, "Access Token"),
+        (TOKEN_TYPE_REFRESH, "Refresh Token"),
+    ]
+
     key = models.CharField(max_length=40, unique=True)
     user = models.ForeignKey(
         to=DogUserModel, related_name="auth_tokens", on_delete=models.CASCADE
@@ -54,14 +61,23 @@ class AuthTokenModel(BaseModel):
     created = models.DateTimeField(auto_now_add=True)
     expires = models.DateTimeField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
+    token_type = models.CharField(
+        max_length=10, choices=TOKEN_TYPE_CHOICES, default=TOKEN_TYPE_ACCESS
+    )
 
     class Meta:
         verbose_name = "Auth Token"
         verbose_name_plural = "Auth Tokens"
+        unique_together = ("user", "token_type")
 
     def save(self, *args, **kwargs):
         if not self.key:
             self.key = self.generate_key()
+        if self.expires is None:
+            if self.token_type == self.TOKEN_TYPE_ACCESS:
+                self.expires = timezone.now() + timezone.timedelta(hours=4)
+            elif self.token_type == self.TOKEN_TYPE_REFRESH:
+                self.expires = timezone.now() + timezone.timedelta(days=7)
         return super().save(*args, **kwargs)
 
     def generate_key(self):
