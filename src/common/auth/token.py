@@ -13,7 +13,7 @@ class TokenAuth(HttpBearer):
             The user if authentication successful, None otherwise
         """
         try:
-            auth_token = AuthTokenModel.objects.select_related('user').get(key=token)
+            auth_token = AuthTokenModel.objects.select_related('user').get(key=token, token_type=AuthTokenModel.TOKEN_TYPE_ACCESS)
             if auth_token.is_valid():
                 return auth_token.user
         except AuthTokenModel.DoesNotExist:
