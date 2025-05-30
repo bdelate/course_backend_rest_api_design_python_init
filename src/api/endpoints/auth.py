@@ -2,7 +2,6 @@ from ninja import Router
 from api.schemas.common_schemas import ErrorSchemaOut
 from api.schemas.auth_schemas import TokenRequestSchemaOut, TokenRequestSchemaIn
 from core.models import AuthTokenModel
-from uuid import UUID
 from django.contrib.auth import authenticate
 router = Router()
 
