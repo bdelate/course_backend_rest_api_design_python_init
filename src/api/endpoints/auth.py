@@ -47,7 +47,7 @@ def refresh_token(request, refresh_token: RefreshTokenRequestSchemaIn):
         or an error if the refresh token is invalid.
     """
     try:
-        refresh = AuthTokenModel.objects.get(key=refresh_token.token, token_type=AuthTokenModel.TOKEN_TYPE_REFRESH)
+        refresh = AuthTokenModel.objects.get(key=refresh_token.refresh_token, token_type=AuthTokenModel.TOKEN_TYPE_REFRESH)
     except AuthTokenModel.DoesNotExist:
         return 401, {"error": "Invalid refresh token"}
     if not refresh.is_valid():
