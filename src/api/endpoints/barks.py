@@ -29,7 +29,7 @@ def get_bark(request, bark_id: UUID):
 @router.delete("/{bark_id}/", response={204: None, 404: ErrorSchemaOut})
 def delete_bark(request, bark_id: UUID):
     """Delete a bark."""
-    bark_instance = BarkModel.objects.filter(id=bark_id).first()
+    bark_instance = BarkModel.objects.filter(id=bark_id, user=request.auth).first()
     if not bark_instance:
         return 404, {"error": "Bark not found"}
 
