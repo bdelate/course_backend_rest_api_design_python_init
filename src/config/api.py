@@ -3,7 +3,7 @@ from api.endpoints.barks import router as barks_router
 from api.endpoints.users import router as users_router
 from api.endpoints.auth import router as auth_router
 from common.auth.token import TokenAuth
-from common.auth.jwt import JWTAuth
+from common.auth.jwt_auth import JWTAuth
 
 api = NinjaAPI(auth=[TokenAuth(), JWTAuth()], title="Social Dog API")
 
