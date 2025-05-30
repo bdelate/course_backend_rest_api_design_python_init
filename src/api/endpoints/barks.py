@@ -56,6 +56,6 @@ def update_bark(request, bark_id: UUID, bark: BarkCreateUpdateSchemaIn):
 def create_bark(request, bark: BarkCreateUpdateSchemaIn):
     """Create a new bark."""
     data = bark.dict()
-    data['user_id'] = DogUserModel.objects.first().id
+    data['user_id'] = request.auth.id
     obj = BarkModel.objects.create(**data)
     return 201, obj
