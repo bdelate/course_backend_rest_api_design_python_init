@@ -20,4 +20,4 @@ def create_jwt(user_id, token_type):
         "exp": int(time.time()) + exp_seconds,
       }
 
-    return jwt.encode(payload, settings.JWT_SECRET_KEY, algorithm='HS256')
+    return jwt.encode(payload, settings.JWT_SECRET, algorithm='HS256')
