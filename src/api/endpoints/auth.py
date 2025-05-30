@@ -1,7 +1,9 @@
+from django.conf import settings
+import jwt
 from ninja import Router
 from api.schemas.common_schemas import ErrorSchemaOut
 from api.schemas.auth_schemas import TokenRequestSchemaOut, TokenRequestSchemaIn, RefreshTokenRequestSchemaIn
-from core.models import AuthTokenModel
+from core.models import AuthTokenModel, DogUserModel
 from django.contrib.auth import authenticate
 from django.utils import timezone
 from common.auth.jwt_auth import create_jwt
@@ -92,4 +94,38 @@ def get_jwt_token(request, credentials: TokenRequestSchemaIn):
         "access_token": access_token,
         "refresh_token": refresh_token,
         "expires_in": 14400  # 4 hours in seconds
+    }
+
+@router.post(
+    "/jwt-token/refresh/",
+    response={200: TokenRequestSchemaOut, 401: ErrorSchemaOut},
+    auth=None,
+)
+def refresh_jwt_token(request, refresh: RefreshTokenRequestSchemaIn):
+    """
+    Endpoint to refresh a JWT access token using a valid refresh token.
+    """
+    try:
+        payload = jwt.decode(
+            refresh.refresh_token, settings.JWT_SECRET, algorithms=["HS256"]
+        )
+    except jwt.DecodeError:
+        return 401, {"error": "Invalid refresh token"}
+    except jwt.ExpiredSignatureError:
+        return 401, {"error": "Expired refresh token"}
+
+    try:
+        user_id = payload["user_id"]
+        assert payload["token_type"] == "refresh"
+        user = DogUserModel.objects.get(id=user_id)
+    except (KeyError, AssertionError, DogUserModel.DoesNotExist):
+        return 401, {"error": "Invalid refresh token"}
+
+    access_token = create_jwt(user_id=user.id, token_type="access")
+    refresh_token = create_jwt(user_id=user.id, token_type="refresh")
+
+    return 200, {
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "expires_in": 14400,  # 4 hours in seconds
     }
