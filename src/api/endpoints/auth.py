@@ -4,6 +4,7 @@ from api.schemas.auth_schemas import TokenRequestSchemaOut, TokenRequestSchemaIn
 from core.models import AuthTokenModel
 from django.contrib.auth import authenticate
 from django.utils import timezone
+from common.auth.jwt_auth import create_jwt_token
 
 router = Router()
 
@@ -64,4 +65,31 @@ def refresh_token(request, refresh_token: RefreshTokenRequestSchemaIn):
         "refresh_token": refresh.key,
         "expires_in": expires_in
     }
+
+@router.post(
+    "/jwt-token/", response={200: TokenRequestSchemaOut, 401: ErrorSchemaOut}, auth=None
+)
+def get_jwt_token(request, credentials: TokenRequestSchemaIn):
+    """
+    Endpoint to get a JWT token.
     
+    Args:
+        request: The HTTP request
+        credentials: The token request schema containing username and password
+    
+    Returns:
+        A JWT access and refresh token if authentication is successful,
+        or an error if the credentials are invalid.
+    """
+    user = authenticate(username=credentials.username, password=credentials.password)
+    if user is None:
+        return 401, {"error": "Invalid credentials"}
+    
+    access_token = create_jwt_token(user.id, 'access')
+    refresh_token = create_jwt_token(user.id, 'refresh')
+    
+    return 200, {
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "expires_in": 14400  # 4 hours in seconds
+    }
