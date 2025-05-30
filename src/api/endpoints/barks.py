@@ -41,7 +41,7 @@ def delete_bark(request, bark_id: UUID):
 @router.put("/{bark_id}/", response={200: BarkSchemaOut, 404: ErrorSchemaOut})
 def update_bark(request, bark_id: UUID, bark: BarkCreateUpdateSchemaIn):
     """Update an existing bark."""
-    bark_instance = BarkModel.objects.filter(id=bark_id).first()
+    bark_instance = BarkModel.objects.filter(id=bark_id, user=request.auth).first()
     if not bark_instance:
         return 404, {"error": "Bark not found"}
 
