@@ -20,7 +20,7 @@ def create_user(request, user: DogUserCreateSchemaIn):
     data = user.dict()
     if DogUserModel.objects.filter(username=data['username']).exists():
         return 400, {"error": "Username already exists"}
-    obj = DogUserModel.objects.create(**data)
+    obj = DogUserModel.objects.create_user(**data)
     token = AuthTokenModel.objects.create(user=obj)
     return 201, {"user": obj, "token": token.key}
 
