@@ -14,7 +14,7 @@ def users_list(request):
     return DogUserModel.objects.all()
 
 
-@router.post("/", response={201: DogUserSchemaOut, 400: ErrorSchemaOut})
+@router.post("/", response={201: DogUserSchemaOut, 400: ErrorSchemaOut}, auth=None)
 def create_user(request, user: DogUserCreateSchemaIn):
     """Create a new user."""
     data = user.dict()
