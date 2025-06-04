@@ -3,7 +3,7 @@ from api.schemas.common_schemas import ErrorSchemaOut
 from api.schemas.bark_schemas import BarkSchemaOut, BarkCreateUpdateSchemaIn
 from core.models import BarkModel
 from uuid import UUID
-from api.logic.bark_logic import handle_create_bark, handle_barks_list
+from api.logic.bark_logic import handle_create_bark, handle_barks_list, handle_get_bark
 from api.logic.exceptions import get_error_response
 
 router = Router()
@@ -23,10 +23,12 @@ def get_bark(request, bark_id: UUID):
     """
     Bark detail endpoint that returns a single bark.
     """
-    bark = BarkModel.objects.filter(id=bark_id).first()
-    if bark:
-        return 200, bark
-    return 404, {"error": "Bark not found"}
+    try:
+        bark_instance = handle_get_bark(bark_id)
+        return 200, bark_instance
+    except Exception as e:
+        status_code, error_response = get_error_response(e)
+        return status_code, error_response
 
 
 @router.delete("/{bark_id}/", response={204: None, 404: ErrorSchemaOut})

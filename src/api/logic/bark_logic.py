@@ -1,4 +1,5 @@
 from core.models import BarkModel, DogUserModel
+from api.logic.exceptions import ResourceNotFoundError
 
 def handle_create_bark(user: DogUserModel, data: dict) -> BarkModel:
     """
@@ -24,3 +25,22 @@ def handle_barks_list() -> list[BarkModel]:
         list[BarkModel]: A list of all barks.
     """
     return list(BarkModel.objects.all())
+
+
+def handle_get_bark(bark_id: str) -> BarkModel:
+    """
+    Handle the logic for retrieving a single bark by its ID.
+    
+    Args:
+        bark_id: The ID of the bark to retrieve.
+    
+    Returns:
+        BarkModel: The requested bark object.
+    
+    Raises:
+        ResourceNotFoundError: If the bark with the given ID does not exist.
+    """
+    bark = BarkModel.objects.filter(id=bark_id).first()
+    if not bark:
+        raise ResourceNotFoundError("Bark not found")
+    return bark
