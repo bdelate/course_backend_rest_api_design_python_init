@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate
 from django.utils import timezone
 from common.auth.jwt_auth import create_jwt
 from api.logic.exceptions import get_error_response
-from api.logic.auth_logic import handle_get_token, handle_refresh_token, handle_get_jwt_token
+from api.logic.auth_logic import handle_get_token, handle_refresh_token, handle_get_jwt_token, handle_refresh_jwt_token
 
 router = Router()
 
@@ -85,28 +85,18 @@ def get_jwt_token(request, credentials: TokenRequestSchemaIn):
 def refresh_jwt_token(request, refresh: RefreshTokenRequestSchemaIn):
     """
     Endpoint to refresh a JWT access token using a valid refresh token.
+    
+    Args:
+        request: The HTTP request
+        refresh: The refresh token schema containing the refresh token string
+    
+    Returns:
+        A new JWT access token is returned if the refresh token is valid,
+        or an error if the refresh token is invalid or expired.
     """
     try:
-        payload = jwt.decode(
-            refresh.refresh_token, settings.JWT_SECRET, algorithms=["HS256"]
-        )
-    except jwt.DecodeError:
-        return 401, {"error": "Invalid refresh token"}
-    except jwt.ExpiredSignatureError:
-        return 401, {"error": "Expired refresh token"}
-
-    try:
-        user_id = payload["user_id"]
-        assert payload["token_type"] == "refresh"
-        user = DogUserModel.objects.get(id=user_id)
-    except (KeyError, AssertionError, DogUserModel.DoesNotExist):
-        return 401, {"error": "Invalid refresh token"}
-
-    access_token = create_jwt(user_id=user.id, token_type="access")
-    refresh_token = create_jwt(user_id=user.id, token_type="refresh")
-
-    return 200, {
-        "access_token": access_token,
-        "refresh_token": refresh_token,
-        "expires_in": 14400,  # 4 hours in seconds
-    }
+        data = handle_refresh_jwt_token(refresh.refresh_token)
+        return 200, data
+    except Exception as e:
+        status_code, error_response = get_error_response(e)
+        return status_code, error_response

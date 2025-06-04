@@ -1,9 +1,10 @@
+from django.conf import settings
 from api.logic.exceptions import AuthenticationError, TokenExpiredError, TokenInvalidError
 from common.auth.jwt_auth import create_jwt
 from core.models import DogUserModel, AuthTokenModel
 from django.contrib.auth import authenticate
 from django.utils import timezone
-
+import jwt
 
 def handle_get_token(username: str, password: str) -> dict:
     """
@@ -84,4 +85,31 @@ def handle_get_jwt_token(username: str, password: str) -> dict:
         "access_token": access_token,
         "refresh_token": refresh_token,
         "expires_in": 14400  # 4 hours in seconds
+    }
+
+
+def handle_refresh_jwt_token(refresh_token: str) -> dict:
+    try:
+        payload = jwt.decode(
+            refresh_token, settings.JWT_SECRET, algorithms=["HS256"]
+        )
+    except jwt.DecodeError:
+        raise TokenInvalidError("Invalid refresh token")
+    except jwt.ExpiredSignatureError:
+        raise TokenExpiredError("Expired refresh token")
+
+    try:
+        user_id = payload["user_id"]
+        assert payload["token_type"] == "refresh"
+        user = DogUserModel.objects.get(id=user_id)
+    except (KeyError, AssertionError, DogUserModel.DoesNotExist):
+        return 401, {"error": "Invalid refresh token"}
+
+    access_token = create_jwt(user_id=user.id, token_type="access")
+    refresh_token = create_jwt(user_id=user.id, token_type="refresh")
+
+    return {
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "expires_in": 14400,  # 4 hours in seconds
     }
