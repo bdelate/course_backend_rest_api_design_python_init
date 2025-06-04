@@ -1,7 +1,7 @@
 from uuid import UUID
 from ninja import Router
 from api.schemas.user_schemas import DogUserSchemaOut, DogUserCreateSchemaIn, DogUserUpdateSchemaIn, DogUserWithTokenSchemaOut
-from core.models import DogUserModel, AuthTokenModel
+from core.models import DogUserModel
 from api.schemas.common_schemas import ErrorSchemaOut
 from api.logic.user_logic import handle_dog_users_list, handle_create_dog_user
 
@@ -34,7 +34,7 @@ def create_user(request, user: DogUserCreateSchemaIn):
         user_obj, token_obj = handle_create_dog_user(username=user.username, password=user.password)
     except ValueError as e:
         return 400, {"error": str(e)}
-    return 201, {"user": user_obj, "token": token_obj}
+    return 201, {"user": user_obj, "token": token_obj.key}
 
 @router.get("/{user_id}/", response={200: DogUserSchemaOut, 404: ErrorSchemaOut})
 def get_user(request, user_id: UUID):
