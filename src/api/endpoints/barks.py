@@ -1,8 +1,10 @@
 from ninja import Router
 from api.schemas.common_schemas import ErrorSchemaOut
 from api.schemas.bark_schemas import BarkSchemaOut, BarkCreateUpdateSchemaIn
-from core.models import BarkModel, DogUserModel
+from core.models import BarkModel
 from uuid import UUID
+from api.logic.bark_logic import handle_create_bark
+from api.logic.exceptions import get_error_response
 
 router = Router()
 
@@ -55,7 +57,5 @@ def update_bark(request, bark_id: UUID, bark: BarkCreateUpdateSchemaIn):
 @router.post("/", response={201: BarkSchemaOut})
 def create_bark(request, bark: BarkCreateUpdateSchemaIn):
     """Create a new bark."""
-    data = bark.dict()
-    data['user_id'] = request.auth.id
-    obj = BarkModel.objects.create(**data)
-    return 201, obj
+    new_bark = handle_create_bark(user=request.auth, data=bark.dict())
+    return 201, new_bark
