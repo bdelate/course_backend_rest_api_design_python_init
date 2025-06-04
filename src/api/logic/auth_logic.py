@@ -80,7 +80,7 @@ def handle_get_jwt_token(username: str, password: str) -> dict:
     access_token = create_jwt(user.id, 'access')
     refresh_token = create_jwt(user.id, 'refresh')
     
-    return 200, {
+    return {
         "access_token": access_token,
         "refresh_token": refresh_token,
         "expires_in": 14400  # 4 hours in seconds
