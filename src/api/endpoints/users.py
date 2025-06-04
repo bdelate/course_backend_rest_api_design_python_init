@@ -4,7 +4,7 @@ from api.logic.exceptions import get_error_response
 from api.schemas.user_schemas import DogUserSchemaOut, DogUserCreateSchemaIn, DogUserUpdateSchemaIn, DogUserWithTokenSchemaOut
 from core.models import DogUserModel
 from api.schemas.common_schemas import ErrorSchemaOut
-from api.logic.user_logic import handle_dog_users_list, handle_create_dog_user, handle_update_me
+from api.logic.user_logic import handle_dog_users_list, handle_create_dog_user, handle_update_me, handle_get_dog_user
 
 router = Router()
 
@@ -42,10 +42,11 @@ def create_user(request, user: DogUserCreateSchemaIn):
 def get_user(request, user_id: UUID):
     """Get a user by ID."""
     try:
-        obj = DogUserModel.objects.get(id=user_id)
-    except DogUserModel.DoesNotExist:
-        return 404, {"error": "Dog user not found"}
-    return obj
+        user = handle_get_dog_user(user_id=user_id)
+    except Exception as e:
+        status_code, error_response = get_error_response(e)
+        return status_code, error_response
+    return 200, user
 
 @router.patch("/me/", response={200: DogUserSchemaOut, 409: ErrorSchemaOut})
 def update_me(request, user: DogUserUpdateSchemaIn):

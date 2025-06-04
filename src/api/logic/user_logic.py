@@ -1,5 +1,5 @@
 from core.models import DogUserModel, AuthTokenModel
-from api.logic.exceptions import DuplicateResourceError
+from api.logic.exceptions import DuplicateResourceError, ResourceNotFoundError
 
 def handle_dog_users_list():
     """
@@ -36,3 +36,13 @@ def handle_update_me(user: DogUserModel, data: dict) -> DogUserModel:
     
     user.save()
     return user
+
+def handle_get_dog_user(user_id: int) -> DogUserModel:
+    """
+    Handle the logic for retrieving a dog user by ID.
+    Returns the user object if found, otherwise raises an exception.
+    """
+    try:
+        return DogUserModel.objects.get(id=user_id)
+    except DogUserModel.DoesNotExist:
+        raise ResourceNotFoundError("Dog user not found")
