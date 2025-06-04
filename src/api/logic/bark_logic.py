@@ -44,3 +44,22 @@ def handle_get_bark(bark_id: str) -> BarkModel:
     if not bark:
         raise ResourceNotFoundError("Bark not found")
     return bark
+
+
+def handle_delete_bark(bark_id: str, user: DogUserModel) -> None:
+    """
+    Handle the logic for deleting a bark.
+    
+    Args:
+        bark_id: The ID of the bark to delete.
+        user: The user who is attempting to delete the bark.
+    
+    Raises:
+        ResourceNotFoundError: If the bark with the given ID does not exist or does not belong to the user.
+    """
+    bark = BarkModel.objects.filter(id=bark_id, user=user).first()
+    if not bark:
+        raise ResourceNotFoundError("Bark not found")
+    
+    # Delete the bark instance
+    bark.delete()

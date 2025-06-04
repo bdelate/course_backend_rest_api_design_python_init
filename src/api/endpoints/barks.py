@@ -3,7 +3,7 @@ from api.schemas.common_schemas import ErrorSchemaOut
 from api.schemas.bark_schemas import BarkSchemaOut, BarkCreateUpdateSchemaIn
 from core.models import BarkModel
 from uuid import UUID
-from api.logic.bark_logic import handle_create_bark, handle_barks_list, handle_get_bark
+from api.logic.bark_logic import handle_create_bark, handle_barks_list, handle_get_bark, handle_delete_bark
 from api.logic.exceptions import get_error_response
 
 router = Router()
@@ -34,13 +34,12 @@ def get_bark(request, bark_id: UUID):
 @router.delete("/{bark_id}/", response={204: None, 404: ErrorSchemaOut})
 def delete_bark(request, bark_id: UUID):
     """Delete a bark."""
-    bark_instance = BarkModel.objects.filter(id=bark_id, user=request.auth).first()
-    if not bark_instance:
-        return 404, {"error": "Bark not found"}
-
-    # Delete the bark instance
-    bark_instance.delete()
-    return 204, None
+    try:
+        handle_delete_bark(bark_id, request.auth)
+        return 204, None
+    except Exception as e:
+        status_code, error_response = get_error_response(e)
+        return status_code, error_response
 
 
 @router.put("/{bark_id}/", response={200: BarkSchemaOut, 404: ErrorSchemaOut})
