@@ -3,15 +3,20 @@ from ninja import Router
 from api.schemas.user_schemas import DogUserSchemaOut, DogUserCreateSchemaIn, DogUserUpdateSchemaIn, DogUserWithTokenSchemaOut
 from core.models import DogUserModel, AuthTokenModel
 from api.schemas.common_schemas import ErrorSchemaOut
+from api.logic.user_logic import handle_dog_users_list
 
 router = Router()
 
+
+
 @router.get("/", response=list[DogUserSchemaOut])
-def users_list(request):
+def dog_users_list(request):
     """
-    User list endpoint that returns a list of users.
+    Endpoint that returns a list of dog users.
     """
-    return DogUserModel.objects.all()
+    users = handle_dog_users_list()
+    return 200, users
+
 
 
 @router.get("/me/", response={200: DogUserSchemaOut})
