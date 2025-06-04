@@ -1,5 +1,6 @@
 from uuid import UUID
 from ninja import Router
+from api.logic.exceptions import get_error_response
 from api.schemas.user_schemas import DogUserSchemaOut, DogUserCreateSchemaIn, DogUserUpdateSchemaIn, DogUserWithTokenSchemaOut
 from core.models import DogUserModel
 from api.schemas.common_schemas import ErrorSchemaOut
@@ -27,13 +28,14 @@ def get_current_user(request):
     return 200, request.auth
 
 
-@router.post("/", response={201: DogUserWithTokenSchemaOut, 400: ErrorSchemaOut}, auth=None)
+@router.post("/", response={201: DogUserWithTokenSchemaOut, 409: ErrorSchemaOut}, auth=None)
 def create_user(request, user: DogUserCreateSchemaIn):
     """Create a new user."""
     try:
         user_obj, token_obj = handle_create_dog_user(username=user.username, password=user.password)
-    except ValueError as e:
-        return 400, {"error": str(e)}
+    except Exception as e:
+        status_code, error_response = get_error_response(e)
+        return status_code, error_response
     return 201, {"user": user_obj, "token": token_obj.key}
 
 @router.get("/{user_id}/", response={200: DogUserSchemaOut, 404: ErrorSchemaOut})

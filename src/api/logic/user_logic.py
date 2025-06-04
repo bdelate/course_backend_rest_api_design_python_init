@@ -1,5 +1,5 @@
 from core.models import DogUserModel, AuthTokenModel
-
+from api.logic.exceptions import DuplicateResourceError
 
 def handle_dog_users_list():
     """
@@ -15,7 +15,7 @@ def handle_create_dog_user(username: str, password: str) -> tuple[DogUserModel, 
     Returns the created user and their authentication token.
     """
     if DogUserModel.objects.filter(username=username).exists():
-        raise ValueError("Username already exists")
+        raise DuplicateResourceError("Username already exists")
     
     user = DogUserModel.objects.create_user(username=username, password=password)
     token = AuthTokenModel.objects.create(user=user)
