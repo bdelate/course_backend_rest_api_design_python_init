@@ -46,3 +46,11 @@ def handle_get_dog_user(user_id: int) -> DogUserModel:
         return DogUserModel.objects.get(id=user_id)
     except DogUserModel.DoesNotExist:
         raise ResourceNotFoundError("Dog user not found")
+    
+
+def handle_get_current_user(user: DogUserModel) -> DogUserModel:
+    """
+    Handle the logic for retrieving the currently authenticated user.
+    Returns the user object.
+    """
+    return user

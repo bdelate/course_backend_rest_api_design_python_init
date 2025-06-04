@@ -2,9 +2,8 @@ from uuid import UUID
 from ninja import Router
 from api.logic.exceptions import get_error_response
 from api.schemas.user_schemas import DogUserSchemaOut, DogUserCreateSchemaIn, DogUserUpdateSchemaIn, DogUserWithTokenSchemaOut
-from core.models import DogUserModel
 from api.schemas.common_schemas import ErrorSchemaOut
-from api.logic.user_logic import handle_dog_users_list, handle_create_dog_user, handle_update_me, handle_get_dog_user
+from api.logic.user_logic import handle_dog_users_list, handle_create_dog_user, handle_update_me, handle_get_dog_user, handle_get_current_user
 
 router = Router()
 
@@ -25,7 +24,8 @@ def get_current_user(request):
     """
     Endpoint that returns the currently authenticated user.
     """
-    return 200, request.auth
+    user = handle_get_current_user(request.auth)
+    return 200, user
 
 
 @router.post("/", response={201: DogUserWithTokenSchemaOut, 409: ErrorSchemaOut}, auth=None)
