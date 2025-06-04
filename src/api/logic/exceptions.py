@@ -16,11 +16,21 @@ class AuthenticationError(LogicError):
     """Raised when authentication fails"""
     pass
 
+class TokenInvalidError(LogicError):
+    """Raised when a token is invalid or expired"""
+    pass
+
+class TokenExpiredError(LogicError):
+    """Raised when a token has expired"""
+    pass
+
 # Mapping of exception types to HTTP status codes
 EXCEPTION_TO_HTTP_STATUS = {
     DuplicateResourceError: 409,  # Conflict
     ResourceNotFoundError: 404,  # Not Found
     AuthenticationError: 401,  # Unauthorized
+    TokenInvalidError: 401,  # Unauthorized
+    TokenExpiredError: 401,  # Unauthorized
     LogicError: 500,  # Internal Server Error (default)
 }
 
