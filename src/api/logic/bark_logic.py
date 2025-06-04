@@ -63,3 +63,30 @@ def handle_delete_bark(bark_id: str, user: DogUserModel) -> None:
     
     # Delete the bark instance
     bark.delete()
+
+
+def handle_update_bark(bark_id: str, user: DogUserModel, data: dict) -> BarkModel:
+    """
+    Handle the logic for updating an existing bark.
+    
+    Args:
+        bark_id: The ID of the bark to update.
+        user: The user who is updating the bark.
+        data: The new data for the bark.
+    
+    Returns:
+        BarkModel: The updated bark object.
+    
+    Raises:
+        ResourceNotFoundError: If the bark with the given ID does not exist or does not belong to the user.
+    """
+    bark = BarkModel.objects.filter(id=bark_id, user=user).first()
+    if not bark:
+        raise ResourceNotFoundError("Bark not found")
+    
+    # Update the bark instance with the new data
+    for attr, value in data.items():
+        setattr(bark, attr, value)
+    bark.save()
+    
+    return bark
