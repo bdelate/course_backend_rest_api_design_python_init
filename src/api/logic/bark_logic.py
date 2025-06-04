@@ -14,3 +14,13 @@ def handle_create_bark(user: DogUserModel, data: dict) -> BarkModel:
     data["user_id"] = user.id
     bark = BarkModel.objects.create(user=user, **data)
     return bark
+
+
+def handle_barks_list() -> list[BarkModel]:
+    """
+    Handle the logic for retrieving a list of barks.
+    
+    Returns:
+        list[BarkModel]: A list of all barks.
+    """
+    return list(BarkModel.objects.all())

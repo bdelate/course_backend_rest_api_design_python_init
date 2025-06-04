@@ -3,7 +3,7 @@ from api.schemas.common_schemas import ErrorSchemaOut
 from api.schemas.bark_schemas import BarkSchemaOut, BarkCreateUpdateSchemaIn
 from core.models import BarkModel
 from uuid import UUID
-from api.logic.bark_logic import handle_create_bark
+from api.logic.bark_logic import handle_create_bark, handle_barks_list
 from api.logic.exceptions import get_error_response
 
 router = Router()
@@ -14,7 +14,8 @@ def barks_list(request):
     """
     Bark list endpoint that returns a list of barks.s
     """
-    return BarkModel.objects.all()
+    barks = handle_barks_list()
+    return 200, barks
 
 
 @router.get("/{bark_id}/", response={200: BarkSchemaOut, 404: ErrorSchemaOut}, auth=None)
