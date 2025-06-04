@@ -1,4 +1,5 @@
 from api.logic.exceptions import AuthenticationError, TokenExpiredError, TokenInvalidError
+from common.auth.jwt_auth import create_jwt
 from core.models import DogUserModel, AuthTokenModel
 from django.contrib.auth import authenticate
 from django.utils import timezone
@@ -58,4 +59,29 @@ def handle_refresh_token(refresh_token: str) -> dict:
         "access_token": access_token.key,
         "refresh_token": new_refresh_token.key,
         "expires_in": int((access_token.expires - timezone.now()).total_seconds())
+    }
+
+def handle_get_jwt_token(username: str, password: str) -> dict:
+    """
+    Handle the logic for getting a JWT token.
+
+    Args:
+        username: The username of the user
+        password: The password of the user
+
+    Returns:
+        A dictionary containing a JWT token, or raises an AuthenticationError if authentication fails.
+    """
+    user = authenticate(username=username, password=password)
+    if user is None:
+        raise AuthenticationError("Invalid credentials")
+
+    
+    access_token = create_jwt(user.id, 'access')
+    refresh_token = create_jwt(user.id, 'refresh')
+    
+    return 200, {
+        "access_token": access_token,
+        "refresh_token": refresh_token,
+        "expires_in": 14400  # 4 hours in seconds
     }

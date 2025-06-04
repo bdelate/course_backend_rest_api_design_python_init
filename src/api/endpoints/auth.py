@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate
 from django.utils import timezone
 from common.auth.jwt_auth import create_jwt
 from api.logic.exceptions import get_error_response
-from api.logic.auth_logic import handle_get_token, handle_refresh_token
+from api.logic.auth_logic import handle_get_token, handle_refresh_token, handle_get_jwt_token
 
 router = Router()
 
@@ -58,28 +58,24 @@ def refresh_token(request, refresh_token: RefreshTokenRequestSchemaIn):
 )
 def get_jwt_token(request, credentials: TokenRequestSchemaIn):
     """
-    Endpoint to get a JWT token.
+    Endpoint to get a JWT access token using username and password.
     
     Args:
         request: The HTTP request
         credentials: The token request schema containing username and password
     
     Returns:
-        A JWT access and refresh token if authentication is successful,
+        A new JWT access token is returned if the credentials are valid,
         or an error if the credentials are invalid.
     """
-    user = authenticate(username=credentials.username, password=credentials.password)
-    if user is None:
-        return 401, {"error": "Invalid credentials"}
-    
-    access_token = create_jwt(user.id, 'access')
-    refresh_token = create_jwt(user.id, 'refresh')
-    
-    return 200, {
-        "access_token": access_token,
-        "refresh_token": refresh_token,
-        "expires_in": 14400  # 4 hours in seconds
-    }
+    try:
+        data = handle_get_jwt_token(
+            username=credentials.username, password=credentials.password
+        )
+        return 200, data
+    except Exception as e:
+        status_code, error_response = get_error_response(e)
+        return status_code, error_response
 
 @router.post(
     "/jwt-token/refresh/",
