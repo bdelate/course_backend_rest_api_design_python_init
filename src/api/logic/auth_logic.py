@@ -103,7 +103,7 @@ def handle_refresh_jwt_token(refresh_token: str) -> dict:
         assert payload["token_type"] == "refresh"
         user = DogUserModel.objects.get(id=user_id)
     except (KeyError, AssertionError, DogUserModel.DoesNotExist):
-        return 401, {"error": "Invalid refresh token"}
+        raise TokenInvalidError("Invalid refresh token")
 
     access_token = create_jwt(user_id=user.id, token_type="access")
     refresh_token = create_jwt(user_id=user.id, token_type="refresh")
