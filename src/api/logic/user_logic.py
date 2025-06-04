@@ -21,3 +21,18 @@ def handle_create_dog_user(username: str, password: str) -> tuple[DogUserModel, 
     token = AuthTokenModel.objects.create(user=user)
     
     return user, token
+
+def handle_update_me(user: DogUserModel, data: dict) -> DogUserModel:
+    """
+    Handle the logic for updating the currently authenticated user.
+    Returns the updated user object.
+    """
+    if 'username' in data and data['username'] != user.username:
+        if DogUserModel.objects.filter(username=data['username']).exists():
+            raise DuplicateResourceError("Username already exists")
+    
+    for attr, value in data.items():
+        setattr(user, attr, value)
+    
+    user.save()
+    return user
