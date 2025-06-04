@@ -12,10 +12,15 @@ class ResourceNotFoundError(LogicError):
     """Raised when a requested resource is not found"""
     pass
 
+class AuthenticationError(LogicError):
+    """Raised when authentication fails"""
+    pass
+
 # Mapping of exception types to HTTP status codes
 EXCEPTION_TO_HTTP_STATUS = {
     DuplicateResourceError: 409,  # Conflict
     ResourceNotFoundError: 404,  # Not Found
+    AuthenticationError: 401,  # Unauthorized
     LogicError: 500,  # Internal Server Error (default)
 }
 

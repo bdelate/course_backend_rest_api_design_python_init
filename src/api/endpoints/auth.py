@@ -7,6 +7,8 @@ from core.models import AuthTokenModel, DogUserModel
 from django.contrib.auth import authenticate
 from django.utils import timezone
 from common.auth.jwt_auth import create_jwt
+from api.logic.exceptions import get_error_response
+from api.logic.auth_logic import handle_get_token
 
 router = Router()
 
@@ -18,23 +20,18 @@ def get_token(request, credentials: TokenRequestSchemaIn):
     
     Args:
         request: The HTTP request
-        token_request: The token request schema containing username and password
+        credentials: The token request schema containing username and password
     
     Returns:
-        A access and refresh token if authentication is successful,
+        A new access and refresh token is returned if the credentials are valid,
+        or an error if the credentials are invalid.
     """
-    user = authenticate(username=credentials.username, password=credentials.password)
-    if user is None:
-        return 401, {"error": "Invalid credentials"}
-    AuthTokenModel.objects.filter(user=user).delete()
-    access = AuthTokenModel.objects.create(user=user, token_type=AuthTokenModel.TOKEN_TYPE_ACCESS)
-    refresh = AuthTokenModel.objects.create(user=user, token_type=AuthTokenModel.TOKEN_TYPE_REFRESH)
-    expires_in = int((access.expires - timezone.now()).total_seconds())
-    return 200, {
-        "access_token": access.key,
-        "refresh_token": refresh.key,
-        "expires_in": expires_in
-    }
+    try:
+        response = handle_get_token(credentials.username, credentials.password)
+        return 200, response
+    except Exception as e:
+        status_code, error_response = get_error_response(e)
+        return status_code, error_response
 
 @router.post("/token/refresh/", response={200: TokenRequestSchemaOut, 401: ErrorSchemaOut}, auth=None)
 def refresh_token(request, refresh_token: RefreshTokenRequestSchemaIn):
