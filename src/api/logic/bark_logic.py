@@ -24,7 +24,7 @@ def handle_barks_list() -> list[BarkModel]:
     Returns:
         list[BarkModel]: A list of all barks.
     """
-    return list(BarkModel.objects.all())
+    return BarkModel.objects.all()
 
 
 def handle_get_bark(bark_id: str) -> BarkModel:
