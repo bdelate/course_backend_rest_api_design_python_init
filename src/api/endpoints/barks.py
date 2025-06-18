@@ -6,13 +6,13 @@ from uuid import UUID
 from api.logic.bark_logic import handle_create_bark, handle_barks_list, handle_get_bark, handle_delete_bark, handle_update_bark
 from api.logic.exceptions import get_error_response
 from ninja.pagination import paginate, PageNumberPagination
-from common.pagination import SkipPagination
+from common.pagination import SkipPagination, TimestampCursorPagination
 
 router = Router()
 
 
 @router.get("/", response=list[BarkSchemaOut], auth=None)
-@paginate(SkipPagination)
+@paginate(TimestampCursorPagination)
 def barks_list(request):
     """
     Bark list endpoint that returns a list of barks.
