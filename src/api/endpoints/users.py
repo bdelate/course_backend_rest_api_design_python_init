@@ -5,12 +5,13 @@ from api.schemas.user_schemas import DogUserSchemaOut, DogUserCreateSchemaIn, Do
 from api.schemas.common_schemas import ErrorSchemaOut
 from api.logic.user_logic import handle_dog_users_list, handle_create_dog_user, handle_update_me, handle_get_dog_user, handle_get_current_user
 from ninja.pagination import paginate, PageNumberPagination
+from common.pagination import SkipPagination
 
 router = Router()
 
 
 @router.get("/", response=list[DogUserSchemaOut])
-@paginate(PageNumberPagination)
+@paginate(SkipPagination)
 def dog_users_list(request):
     """
     Endpoint that returns a list of dog users.
