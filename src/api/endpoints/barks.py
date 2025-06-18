@@ -5,17 +5,20 @@ from core.models import BarkModel
 from uuid import UUID
 from api.logic.bark_logic import handle_create_bark, handle_barks_list, handle_get_bark, handle_delete_bark, handle_update_bark
 from api.logic.exceptions import get_error_response
+from ninja.pagination import paginate
 
 router = Router()
 
 
 @router.get("/", response=list[BarkSchemaOut], auth=None)
+@paginate
 def barks_list(request):
     """
-    Bark list endpoint that returns a list of barks.s
+    Bark list endpoint that returns a list of barks.
     """
-    barks = handle_barks_list()
-    return 200, barks
+    objs = handle_barks_list()
+    return objs
+
 
 
 @router.get("/{bark_id}/", response={200: BarkSchemaOut, 404: ErrorSchemaOut}, auth=None)
