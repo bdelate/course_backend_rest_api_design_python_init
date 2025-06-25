@@ -10,7 +10,7 @@ def handle_dog_users_list(favorite_toy: Optional[str] = None) -> QuerySet[DogUse
     """
     objs = DogUserModel.objects.all()
     if favorite_toy:
-        objs = objs.filter(favorite_toy=favorite_toy)
+        objs = objs.filter(favorite_toy__icontains=favorite_toy)
     return objs
 
 
