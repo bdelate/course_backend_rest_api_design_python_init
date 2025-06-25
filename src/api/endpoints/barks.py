@@ -12,7 +12,6 @@ router = Router()
 
 
 @router.get("/", response=list[BarkSchemaOut], auth=None)
-@paginate(TimestampCursorPagination)
 def barks_list(request):
     """
     Bark list endpoint that returns a list of barks.
