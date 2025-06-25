@@ -4,18 +4,18 @@ from api.logic.exceptions import get_error_response
 from api.schemas.user_schemas import DogUserSchemaOut, DogUserCreateSchemaIn, DogUserUpdateSchemaIn, DogUserWithTokenSchemaOut
 from api.schemas.common_schemas import ErrorSchemaOut
 from api.logic.user_logic import handle_dog_users_list, handle_create_dog_user, handle_update_me, handle_get_dog_user, handle_get_current_user
-from ninja.pagination import paginate, PageNumberPagination
-from common.pagination import SkipPagination
+from ninja.pagination import paginate
 
 router = Router()
 
 
 @router.get("/", response=list[DogUserSchemaOut])
-def dog_users_list(request):
+@paginate
+def dog_users_list(request, favorite_toy: str = None):
     """
     Endpoint that returns a list of dog users.
     """
-    users = handle_dog_users_list()
+    users = handle_dog_users_list(favorite_toy=favorite_toy)
     return users
 
 

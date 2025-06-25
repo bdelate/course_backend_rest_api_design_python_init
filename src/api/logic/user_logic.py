@@ -1,12 +1,17 @@
+from typing import Optional
 from core.models import DogUserModel, AuthTokenModel
 from api.logic.exceptions import DuplicateResourceError, ResourceNotFoundError
+from django.db.models import QuerySet
 
-def handle_dog_users_list():
+def handle_dog_users_list(favorite_toy: Optional[str] = None) -> QuerySet[DogUserModel]:
     """
     Handle the logic for listing dog users.
     Returns a list of all dog users.
     """
-    return DogUserModel.objects.all()
+    objs = DogUserModel.objects.all()
+    if favorite_toy:
+        objs = objs.filter(favorite_toy=favorite_toy)
+    return objs
 
 
 def handle_create_dog_user(username: str, password: str) -> tuple[DogUserModel, AuthTokenModel]:
