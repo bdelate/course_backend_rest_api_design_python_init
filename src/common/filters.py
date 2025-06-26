@@ -1,9 +1,8 @@
 from typing import Optional
-from ninja import Schema
+from ninja import FilterSchema, Field
 
-class UsersFilter(Schema):
-    """
-    Filter schema for user endpoints.
-    """
-    favorite_toy: Optional[str] = None
-    username: Optional[str] = None
+class UsersFilter(FilterSchema):
+    """Filter schema for user endpoints."""
+
+    favorite_toy: Optional[str] = Field(None, q="favorite_toy__icontains")
+    username: Optional[str] = Field(None, q="username__icontains")
