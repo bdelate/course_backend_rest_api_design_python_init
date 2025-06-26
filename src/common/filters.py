@@ -6,6 +6,9 @@ class UsersFilter(FilterSchema):
 
     favorite_toy: Optional[str] = Field(None, q="favorite_toy__icontains")
     username: Optional[str] = Field(None, q="username__icontains")
+    search: Optional[str] = Field(
+        None, q=["favorite_toy__icontains", "username__icontains"]
+    )
 
 
 class BarksFilter(FilterSchema):
