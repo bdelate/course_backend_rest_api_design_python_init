@@ -1,9 +1,9 @@
-from django.contrib.auth.models import AbstractUser
-from django.db import models
-from uuid import uuid4
 import binascii
 import os
+from django.contrib.auth.models import AbstractUser
+from django.db import models
 from django.utils import timezone
+from uuid import uuid4
 
 
 class BaseModel(models.Model):
@@ -31,10 +31,13 @@ class DogUserModel(AbstractUser, BaseModel):
 
 
 class BarkModel(BaseModel):
-    """Model representing a bark."""
+    """Model representing a bark made by a dog."""
 
+    user = models.ForeignKey(
+        DogUserModel, on_delete=models.CASCADE, related_name="barks"
+    )
     message = models.CharField(max_length=200)
-    user = models.ForeignKey(DogUserModel, on_delete=models.CASCADE, related_name="barks")
+    sniff_count = models.PositiveIntegerField(default=0)
 
     class Meta:
         verbose_name = "Bark"
@@ -42,27 +45,27 @@ class BarkModel(BaseModel):
 
     def __str__(self):
         return f"{self.user.username} - {self.message[:20]}..."
-    
+
 
 class AuthTokenModel(BaseModel):
     """Represents an authentication token for a user"""
 
     TOKEN_TYPE_ACCESS = "access"
     TOKEN_TYPE_REFRESH = "refresh"
-    TOKEN_TYPE_CHOICES = [
-        (TOKEN_TYPE_ACCESS, "Access Token"),
-        (TOKEN_TYPE_REFRESH, "Refresh Token"),
-    ]
+    TOKEN_TYPE_CHOICES = (
+        (TOKEN_TYPE_ACCESS, "Access"),
+        (TOKEN_TYPE_REFRESH, "Refresh"),
+    )
 
     key = models.CharField(max_length=40, unique=True)
     user = models.ForeignKey(
         to=DogUserModel, related_name="auth_tokens", on_delete=models.CASCADE
     )
-    expires = models.DateTimeField(null=True, blank=True)
-    is_active = models.BooleanField(default=True)
     token_type = models.CharField(
         max_length=10, choices=TOKEN_TYPE_CHOICES, default=TOKEN_TYPE_ACCESS
     )
+    expires = models.DateTimeField(null=True, blank=True)
+    is_active = models.BooleanField(default=True)
 
     class Meta:
         verbose_name = "Auth Token"
@@ -72,11 +75,13 @@ class AuthTokenModel(BaseModel):
     def save(self, *args, **kwargs):
         if not self.key:
             self.key = self.generate_key()
+
         if self.expires is None:
             if self.token_type == self.TOKEN_TYPE_ACCESS:
                 self.expires = timezone.now() + timezone.timedelta(hours=4)
-            elif self.token_type == self.TOKEN_TYPE_REFRESH:
+            else:
                 self.expires = timezone.now() + timezone.timedelta(days=7)
+
         return super().save(*args, **kwargs)
 
     def generate_key(self):
@@ -91,4 +96,24 @@ class AuthTokenModel(BaseModel):
         return self.is_active and not self.is_expired()
 
     def __str__(self):
-        return f"Token {self.key[:6]}... for {self.user.username}"
+        return f"{self.token_type.capitalize()} Token {self.key[:6]}... for {self.user.username}"
+
+
+class UserSniffModel(BaseModel):
+    """Represents a user's sniff (like) of a bark."""
+
+    user = models.ForeignKey(
+        DogUserModel, on_delete=models.CASCADE, related_name="sniffs"
+    )
+    bark = models.ForeignKey(
+        BarkModel, on_delete=models.CASCADE, related_name="user_sniffs"
+    )
+
+    class Meta:
+        verbose_name = "User Sniff"
+        verbose_name_plural = "User Sniffs"
+        # Ensure a user can only sniff a bark once
+        unique_together = ("user", "bark")
+
+    def __str__(self):
+        return f"{self.user.username} sniffed {self.bark.message[:15]}..."
