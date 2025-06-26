@@ -11,6 +11,7 @@ class BarkSchemaOut(ModelSchema):
     created_date: str
     updated_date: str
     updated_time: str
+    sniff_count: int
 
     class Meta:
         model = BarkModel
