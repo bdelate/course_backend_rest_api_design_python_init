@@ -1,6 +1,7 @@
 from common.filters import BarksFilter
 from core.models import BarkModel, DogUserModel
 from api.logic.exceptions import ResourceNotFoundError
+from django.db.models import QuerySet
 
 def handle_create_bark(user: DogUserModel, data: dict) -> BarkModel:
     """
@@ -18,15 +19,16 @@ def handle_create_bark(user: DogUserModel, data: dict) -> BarkModel:
     return bark
 
 
-def handle_barks_list(filters: BarksFilter) -> list[BarkModel]:
+def handle_barks_list(filters: BarksFilter) -> QuerySet[BarkModel]:
     """
     Handle the logic for retrieving a list of barks.
-    
-    Returns:
-        list[BarkModel]: A list of all barks.
+    Returns a list of BarkModel instances.
     """
-    objs =  BarkModel.objects.all()
-    return filters.filter(objs)
+    objs = BarkModel.objects.select_related("user").all()
+    queryset = filters.filter(objs)
+    if filters.trending:
+        queryset = queryset.order_by("-sniff_count")
+    return queryset
 
 
 
