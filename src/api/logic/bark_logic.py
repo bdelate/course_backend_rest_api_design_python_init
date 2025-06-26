@@ -1,4 +1,4 @@
-from common.filters import BarksFilter
+from common.filters import BarksFilter, apply_ordering
 from core.models import BarkModel, DogUserModel
 from api.logic.exceptions import ResourceNotFoundError
 from django.db.models import QuerySet
@@ -19,6 +19,7 @@ def handle_create_bark(user: DogUserModel, data: dict) -> BarkModel:
     return bark
 
 
+
 def handle_barks_list(filters: BarksFilter) -> QuerySet[BarkModel]:
     """
     Handle the logic for retrieving a list of barks.
@@ -28,6 +29,10 @@ def handle_barks_list(filters: BarksFilter) -> QuerySet[BarkModel]:
     queryset = filters.filter(objs)
     if filters.trending:
         queryset = queryset.order_by("-sniff_count")
+    elif filters.order_by:
+        queryset = apply_ordering(
+            queryset=queryset, order_by=filters.order_by, model_class=BarkModel
+        )
     return queryset
 
 
