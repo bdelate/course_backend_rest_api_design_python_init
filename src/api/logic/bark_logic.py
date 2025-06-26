@@ -1,3 +1,4 @@
+from common.filters import BarksFilter
 from core.models import BarkModel, DogUserModel
 from api.logic.exceptions import ResourceNotFoundError
 
@@ -17,14 +18,16 @@ def handle_create_bark(user: DogUserModel, data: dict) -> BarkModel:
     return bark
 
 
-def handle_barks_list() -> list[BarkModel]:
+def handle_barks_list(filters: BarksFilter) -> list[BarkModel]:
     """
     Handle the logic for retrieving a list of barks.
     
     Returns:
         list[BarkModel]: A list of all barks.
     """
-    return BarkModel.objects.all()
+    objs =  BarkModel.objects.all()
+    return filters.filter(objs)
+
 
 
 def handle_get_bark(bark_id: str) -> BarkModel:

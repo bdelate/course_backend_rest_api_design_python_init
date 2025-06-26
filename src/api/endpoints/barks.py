@@ -1,21 +1,21 @@
-from ninja import Router
+from ninja import Router, Query
 from api.schemas.common_schemas import ErrorSchemaOut
 from api.schemas.bark_schemas import BarkSchemaOut, BarkCreateUpdateSchemaIn
 from uuid import UUID
 from api.logic.bark_logic import handle_create_bark, handle_barks_list, handle_get_bark, handle_delete_bark, handle_update_bark
 from api.logic.exceptions import get_error_response
 from ninja.pagination import paginate
-
+from common.filters import BarksFilter
 router = Router()
 
 
 @router.get("/", response=list[BarkSchemaOut], auth=None)
 @paginate
-def barks_list(request):
+def barks_list(request, filters: BarksFilter = Query(...)):
     """
     Bark list endpoint that returns a list of barks.
     """
-    objs = handle_barks_list()
+    objs = handle_barks_list(filters=filters)
     return objs
 
 
