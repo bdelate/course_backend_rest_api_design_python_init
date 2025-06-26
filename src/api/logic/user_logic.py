@@ -1,14 +1,21 @@
-from common.filters import UsersFilter
+from common.filters import UsersFilter, apply_ordering
 from core.models import DogUserModel, AuthTokenModel
 from api.logic.exceptions import DuplicateResourceError, ResourceNotFoundError
 from django.db.models import QuerySet
 
+
 def handle_dog_users_list(filters: UsersFilter) -> QuerySet[DogUserModel]:
     """
     Handle the logic for listing dog users.
+    Returns a list of all dog users.
     """
     objs = DogUserModel.objects.all()
-    return filters.filter(objs)
+    queryset = filters.filter(objs)
+    if filters.order_by:
+        queryset = apply_ordering(
+            queryset=queryset, order_by=filters.order_by, model_class=DogUserModel
+        )
+    return queryset
 
 
 

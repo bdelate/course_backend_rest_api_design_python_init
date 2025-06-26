@@ -14,6 +14,11 @@ class UsersFilter(FilterSchema):
     search: Optional[str] = Field(
         None, q=["favorite_toy__icontains", "username__icontains"]
     )
+    order_by: Optional[str] = None
+
+    def filter_order_by(self, value: str) -> str:
+        """Filter for ordering users"""
+        return Q()
 
 
 class BarksFilter(FilterSchema):
