@@ -1,4 +1,4 @@
-from ninja import ModelSchema
+from ninja import ModelSchema, Schema
 from core.models import BarkModel
 from api.schemas.user_schemas import DogUserSchemaOut
 from pydantic import field_validator
@@ -55,3 +55,11 @@ class BarkCreateUpdateSchemaIn(ModelSchema):
             raise ValueError("Message cannot be empty or just whitespace")
         return v
 
+
+class BarkCsvExportSchema(Schema):
+    """Schema for CSV export data"""
+
+    message: str
+    sniff_count: int
+    created_at: str
+    username: str
