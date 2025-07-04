@@ -24,14 +24,20 @@ class TokenExpiredError(LogicError):
     """Raised when a token has expired"""
     pass
 
-# Mapping of exception types to HTTP status codes
+class InvalidFileError(LogicError):
+    """Raised when an invalid file is uploaded"""
+
+    pass
+
+
 EXCEPTION_TO_HTTP_STATUS = {
-    DuplicateResourceError: 409,  # Conflict
-    ResourceNotFoundError: 404,  # Not Found
-    AuthenticationError: 401,  # Unauthorized
-    TokenInvalidError: 401,  # Unauthorized
-    TokenExpiredError: 401,  # Unauthorized
-    LogicError: 500,  # Internal Server Error (default)
+    DuplicateResourceError: 409,
+    ResourceNotFoundError: 404,
+    AuthenticationError: 401,
+    TokenInvalidError: 401,
+    TokenExpiredError: 401,
+    InvalidFileError: 400,
+    LogicError: 500,
 }
 
 
