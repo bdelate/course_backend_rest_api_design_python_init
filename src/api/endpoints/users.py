@@ -1,11 +1,24 @@
 from uuid import UUID
-from ninja import Router, Query
-from api.logic.exceptions import get_error_response
-from api.schemas.user_schemas import DogUserSchemaOut, DogUserCreateSchemaIn, DogUserUpdateSchemaIn, DogUserWithTokenSchemaOut
+from ninja import Router, Query, File
+from ninja.files import UploadedFile
+from api.schemas.user_schemas import (
+    DogUserSchemaOut,
+    DogUserCreateSchemaIn,
+    DogUserUpdateSchemaIn,
+    DogUserWithTokenSchemaOut,
+)
 from api.schemas.common_schemas import ErrorSchemaOut
-from api.logic.user_logic import handle_dog_users_list, handle_create_dog_user, handle_update_me, handle_get_dog_user, handle_get_current_user
-from common.filters import UsersFilter
+from api.logic.user_logic import (
+    handle_create_dog_user,
+    handle_dog_users_list,
+    handle_update_me,
+    handle_get_dog_user,
+    handle_get_current_user,
+    handle_upload_profile_image,
+)
+from api.logic.exceptions import get_error_response
 from ninja.pagination import paginate
+from common.filters import UsersFilter
 
 router = Router()
 
@@ -18,11 +31,6 @@ def dog_users_list(request, filters: UsersFilter = Query(...)):
     """
     users = handle_dog_users_list(filters=filters)
     return users
-
-
-
-
-
 
 @router.get("/me/", response={200: DogUserSchemaOut})
 def get_current_user(request):
@@ -62,3 +70,18 @@ def update_me(request, user: DogUserUpdateSchemaIn):
         status_code, error_response = get_error_response(e)
         return status_code, error_response
     return 200, updated_user
+
+
+@router.post(
+    "/me/profile-image/", response={200: DogUserSchemaOut, 400: ErrorSchemaOut}
+)
+def upload_profile_image(request, image: UploadedFile = File(...)):
+    """
+    Endpoint for uploading a profile image for the current user.
+    """
+    try:
+        updated_user = handle_upload_profile_image(user=request.auth, image=image)
+        return 200, updated_user
+    except Exception as e:
+        status_code, error_response = get_error_response(e)
+        return status_code, error_response
